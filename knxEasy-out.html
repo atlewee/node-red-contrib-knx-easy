@@ -1,0 +1,42 @@
+<script type="text/javascript">
+    RED.nodes.registerType('knxEasy-out', {
+        category: 'output',
+        color: '#a6bbcf',
+        defaults: {
+            server: {value:"", type:"knxEasy-config"},
+            topic: {value:""},
+            dpt: {value:""},
+            name: {value: ""}
+        },
+        inputs: 1,
+        outputs: 0,
+        align: "right",
+        icon: "knx.png",
+        label: function() {
+            return this.name||this.topic||"knx-out"
+        }
+    })
+</script>
+
+<script type="text/x-red" data-template-name="knxEasy-out">
+    <div class="form-row">
+            <label for="node-input-server"><i class="fa fa-tag"></i> Server </label>
+            <input type="text" id="node-input-server" placeholder="Server">
+    </div>
+    <div class="form-row">
+        <label for="node-input-topic"><i class="fa fa-tasks"></i> Topic </label>
+        <input type="text" id="node-input-topic" placeholder="Group Address (1/1/1)">
+    </div>
+    <div class="form-row">
+        <label for="node-input-dpt"><i class="fa fa-tasks"></i> Datapoint </label>
+        <input type="text" id="node-input-dpt" placeholder="Datapoint (DPT1.001)">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name </label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="knxEasy-out">
+    <p> knxEasy-Out help comes here.. </p>
+</script>
