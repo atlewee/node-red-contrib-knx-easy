@@ -6,7 +6,6 @@ module.exports = function (RED) {
         node.topic = config.topic
         node.dpt = config.dpt || "DPT1.001"
 
-        node.status({fill:"red",shape:"dot",text:"node-red:common.status.disconnected"});
         if (node.server) {
             if (node.topic) {
                 node.server.register("in", node)

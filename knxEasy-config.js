@@ -36,38 +36,40 @@ module.exports = function(RED) {
 
         node.connect = function () {
             if (!node.connected && !node.connecting) {
-                node.connecting = true;
+                node.connecting = true
                 node.knxConnection = new knx.Connection({
                     ipAddr: node.host,
                     ipPort: node.port,
                     handlers: {
                         connected: function() {
-                            node.connecting = false;
-                            node.connected = true;
+                            node.connecting = false
+                            node.connected = true
                             for (var id in node.inputUsers) {
                                 if (node.inputUsers.hasOwnProperty(id)) {
-                                    node.inputUsers[id].status({fill:"green",shape:"dot",text:"node-red:common.status.connected"});
+                                    node.inputUsers[id].status({fill:"green",shape:"dot",text:"node-red:common.status.connected"})
                                 }
                             }
                             for (var id in node.outputUsers) {
                                 if (node.outputUsers.hasOwnProperty(id)) {
-                                    node.outputUsers[id].status({fill:"green",shape:"dot",text:"node-red:common.status.connected"});
+                                    node.outputUsers[id].status({fill:"green",shape:"dot",text:"node-red:common.status.connected"})
                                 }
                             }
                         },
                         error: function(connstatus) {
-                            node.connecting = false;
-                            node.connected = false;
+                            node.error(connstatus)
+                            node.connecting = false
+                            node.connected = false
                             for (var id in node.inputUsers) {
                                 if (node.inputUsers.hasOwnProperty(id)) {
-                                    node.inputUsers[id].status({fill:"red",shape:"dot",text:"node-red:common.status.disconnected"});
+                                    node.inputUsers[id].status({fill:"red",shape:"dot",text:"node-red:common.status.disconnected"})
                                 }
                             }
                             for (var id in node.outputUsers) {
                                 if (node.outputUsers.hasOwnProperty(id)) {
-                                    node.outputUsers[id].status({fill:"red",shape:"dot",text:"node-red:common.status.disconnected"});
+                                    node.outputUsers[id].status({fill:"red",shape:"dot",text:"node-red:common.status.disconnected"})
                                 }
                             }
+                            node.connect()
                         }
                     }
                 })
