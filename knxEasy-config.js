@@ -91,6 +91,7 @@ module.exports = function(RED) {
         };
         
         node.on("close", function () {
+            node.knxConnection.disconnect()
             node.knxConnection = null
         })
     }
