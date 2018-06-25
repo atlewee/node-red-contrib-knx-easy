@@ -3,7 +3,7 @@
         category: 'output',
         color: '#a6bbcf',
         defaults: {
-            server: {value:"", type:"knxEasy-config"},
+            server: {type:"knxEasy-config", required: true},
             topic: {value:""},
             dpt: {value:""},
             name: {value: ""}
@@ -21,7 +21,7 @@
 <script type="text/x-red" data-template-name="knxEasy-out">
     <div class="form-row">
             <label for="node-input-server"><i class="fa fa-tag"></i> Server </label>
-            <input type="text" id="node-input-server" placeholder="Server">
+            <input type="text" id="node-input-server">
     </div>
     <div class="form-row">
         <label for="node-input-topic"><i class="fa fa-tasks"></i> Group Address </label>
