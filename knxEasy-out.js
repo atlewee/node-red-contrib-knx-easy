@@ -5,7 +5,7 @@ module.exports = function (RED) {
         var node = this
         node.server = RED.nodes.getNode(config.server)
         node.topic = config.topic
-        node.dpt = config.dpt || "DPT1.001"
+        node.dpt = config.dpt || "1.001"
 
         if (node.server) {
             if (node.topic) {

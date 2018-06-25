@@ -77,11 +77,23 @@ module.exports = function(RED) {
                     if (evt == "GroupValue_Write" || evt == "GroupValue_Response") {
                         for (var id in node.inputUsers) {
                             if (node.inputUsers.hasOwnProperty(id)) {
-                                if (node.inputUsers[id].topic == dest) {
-                                    var dpt = dptlib.resolve(node.inputUsers[id].dpt)
+				                var input = node.inputUsers[id]
+                                if (input.topic == dest) {
+                                    var dpt = dptlib.resolve(input.dpt)
                                     var jsValue = dptlib.fromBuffer(value,dpt)
-                                    var msg = {topic:dest, payload:jsValue}
-                                    node.inputUsers[id].send(msg)
+                                    var msg = 
+                                        { topic:dest
+                                        , payload:jsValue
+                                        , knx: 
+                                            { event: evt
+                                            , dpt: input.dpt
+                                            , dptDetails: dpt
+                                            , source: src
+                                            , destination: dest
+                                            , rawValue: value
+                                            }
+                                        }
+                                    input.send(msg)
                                 }
                             }
                         }
