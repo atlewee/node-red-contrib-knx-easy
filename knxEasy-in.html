@@ -3,24 +3,24 @@
         category: 'input',
         color: '#a6bbcf',
         defaults: {
-            server: {type:"knxEasy-config", required: true},
-            topic: {value:""},
-            dpt: {value:""},
-            name: {value: ""}
+            server: { type: "knxEasy-config", required: true },
+            topic: { value: "" },
+            dpt: { value: "" },
+            name: { value: "" }
         },
         inputs: 0,
         outputs: 1,
         align: "left",
         icon: "knx.png",
-        label: function() {
-            return this.name||this.topic||"knx-in"
+        label: function () {
+            return this.name || this.topic || "knx-in"
         }
     })
 </script>
 
 <script type="text/x-red" data-template-name="knxEasy-in">
     <div class="form-row">
-        <label for="node-input-server"><i class="fa fa-tag"></i> Server </label>
+        <label for="node-input-server"><i class="fa fa-tag"></i> Gateway </label>
         <input type="text" id="node-input-server">
     </div>
     <div class="form-row">
