@@ -31,6 +31,19 @@ module.exports = function (RED) {
             }
         }
 
+        node.readInitialValues = function () {
+            var delay = 50
+            for (var id in node.inputUsers) {
+                if (node.inputUsers.hasOwnProperty(id)) {
+                    let inputNode = node.inputUsers[id]
+                    if (inputNode.initialread) {
+                        setTimeout(inputNode._events.input, delay)
+                        delay = delay + 50
+                    }
+                }
+            }
+        }
+
         node.setStatusHelper = function (fill, text) {
             for (var id in node.inputUsers) {
                 if (node.inputUsers.hasOwnProperty(id)) {
@@ -68,6 +81,7 @@ module.exports = function (RED) {
                     connected: function () {
                         if (knxErrorTimeout == undefined) {
                             node.setStatus("connected")
+                            node.readInitialValues()
                         }
                     },
                     error: function (connstatus) {
@@ -77,7 +91,6 @@ module.exports = function (RED) {
                         } else {
                             node.setStatus("disconnected")
                         }
-                        knxErrorTimeout = setTimeout(node.setStatus, 10000, "connected")
                     }
                 }
             })

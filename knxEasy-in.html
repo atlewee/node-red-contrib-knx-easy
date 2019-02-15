@@ -6,9 +6,10 @@
             server: { type: "knxEasy-config", required: true },
             topic: { value: "" },
             dpt: { value: "" },
+            initialread: { value: false },
             name: { value: "" }
         },
-        inputs: 0,
+        inputs: 1,
         outputs: 1,
         align: "left",
         icon: "knx.png",
@@ -221,11 +222,53 @@
         <label for="node-input-name"><i class="fa fa-tag"></i> Name </label>
         <input type="text" id="node-input-name" placeholder="Name">
     </div>
+    <div class="form-row">
+        <label style="width:auto" for="node-input-initialread"> Read this value on startup </label>
+        <input type="checkbox" id="node-input-initialread" style="display:inline-block; width:auto; vertical-align:top;">
+    </div>
 </script>
 
 <script type="text/x-red" data-help-name="knxEasy-in">
-    <p> Select KNX server/gateway, select what Group address to listen to + the DPT. </p>
-    <p>	Anytime this group address is written to, you will be notified. </p>
-    <p> msg : { topic : "Destination", payload: "Value", knx: "knx, explained below" </p>
-    <p>	knx: { event: "GroupValue_write", dpt: "f.eks. DPT14.019", dptDetails: "name, description,unit,use", source, destination }</p>
-</script>
+    <p>	Anytime the selected group address is written to, you will be notified. </p>
+    <p> Manual readRequests is also possible by injecting messages to this node <p>
+
+    <h3>Properties</h3>
+        <dl class="message-properties">
+            <dt>Gateway</dt>
+            <dd> Selected KNX gateway. </dd>
+        </dl>
+        <dl class="message-properties">
+            <dt>Group Address
+                <span class="property-type">x/y/z</span>
+            </dt>
+            <dd> KNX Group address to read/subscribe to. </dd>
+        </dl>
+        <dl class="message-properties">
+            <dt>Datapoint</dt>
+            <dd> KNX datapoint type (DPT). </dd>
+        </dl>
+        <dl class="message-properties">
+                <dt>Read on startup</dt>
+                <dd> When checked, a readRequest will be sent when connection is established/reestablished </dd>
+        </dl>
+
+        <h3>Output</h3>
+        <pre> 
+msg = {
+    "topic": "1/1/1",
+    "payload": 0, 
+    "knx": { 
+        "event": "GroupValue_Write", 
+        "dpt":"1.001", 
+        "dptDetails": { 
+            "name": "DPT_Switch",
+            "desc": "switch",
+            "use":"G"
+        }, 
+    "source":"2.2.2", 
+    "destination": "1/1/1", 
+    "rawValue":[0]
+    }
+} </pre>
+        
+    </script>
