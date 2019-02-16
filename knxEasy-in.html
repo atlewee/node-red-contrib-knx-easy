@@ -229,8 +229,14 @@
 </script>
 
 <script type="text/x-red" data-help-name="knxEasy-in">
-    <p>	Anytime the selected group address is written to, you will be notified. </p>
-    <p> Manual readRequests is also possible by injecting messages to this node <p>
+    <p>	A notification message will be created anytime one of the following events occured for the selected group address:
+        <ul>
+            <li> a write request is received </li>
+            <li> a read request received </li>
+            <li> a response to a read request is received </li>
+        </ul>
+    </p>
+    <p> Creation of a manual read request is also possible by injecting messages to this node. <p>
 
     <h3>Properties</h3>
         <dl class="message-properties">
@@ -253,22 +259,67 @@
         </dl>
 
         <h3>Output</h3>
-        <pre> 
+        <ol class="node-ports">
+            <li>Output of write requests
+                    <dl class="message-properties">
+<pre>
 msg = {
     "topic": "1/1/1",
-    "payload": 0, 
-    "knx": { 
-        "event": "GroupValue_Write", 
-        "dpt":"1.001", 
-        "dptDetails": { 
+    "payload": 0,
+    "knx": {
+        "event": "GroupValue_Write",
+        "dpt": "1.001",
+        "dptDetails": {
             "name": "DPT_Switch",
             "desc": "switch",
-            "use":"G"
-        }, 
-    "source":"2.2.2", 
-    "destination": "1/1/1", 
-    "rawValue":[0]
+            "use": "G"
+        },
+    "source": "2.2.2",
+    "destination": "1/1/1",
+    "rawValue": [0]
     }
 } </pre>
-        
+                    </dl>
+            </li>
+            <li>Output of read requests
+                    <dl class="message-properties">
+<pre> msg = {
+    "topic": "1/1/1",
+    "payload": null,
+    "knx": {
+        "event": "GroupValue_Read",
+        "dpt":"1.001",
+        "dptDetails": {
+            "name": "DPT_Switch",
+            "desc": "switch",
+            "use": "G"
+        },
+    "source": "2.2.2",
+    "destination": "1/1/1",
+    "rawValue": null
+    }
+} </pre>
+                    </dl>
+            </li>
+            <li>Output of responses
+                    <dl class="message-properties">
+<pre> msg = {
+    "topic": "1/1/1",
+    "payload": 0,
+    "knx": {
+        "event": "GroupValue_Response",
+        "dpt":"1.001",
+        "dptDetails": {
+            "name": "DPT_Switch",
+            "desc": "switch",
+            "use": "G"
+        },
+    "source": "2.2.2",
+    "destination": "1/1/1",
+    "rawValue": [0]
+    }
+} </pre>
+                    </dl>
+            </li>
+        </ol>
     </script>

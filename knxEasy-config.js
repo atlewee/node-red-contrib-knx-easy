@@ -95,33 +95,48 @@ module.exports = function (RED) {
                 }
             })
             node.knxConnection.on("event", function (evt, src, dest, value) {
-                if (evt == "GroupValue_Write" || evt == "GroupValue_Response") {
+                if (evt == "GroupValue_Read" || evt == "GroupValue_Write" || evt == "GroupValue_Response") {
                     for (var id in node.inputUsers) {
                         if (node.inputUsers.hasOwnProperty(id)) {
                             var input = node.inputUsers[id]
                             if (input.topic == dest) {
-                                var dpt = dptlib.resolve(input.dpt)
-                                var jsValue = dptlib.fromBuffer(value, dpt)
-                                var msg =
-                                {
-                                    topic: dest
-                                    , payload: jsValue
-                                    , knx:
-                                    {
-                                        event: evt
-                                        , dpt: input.dpt
-                                        , dptDetails: dpt
-                                        , source: src
-                                        , destination: dest
-                                        , rawValue: value
-                                    }
+                                if(evt == "GroupValue_Read") {
+                                    // In case of GroupValue_Read event no payload / value is available
+                                    value = null
                                 }
+                                var msg = buildInputMessage(src, dest, evt, value, input.dpt)
                                 input.send(msg)
                             }
                         }
                     }
                 }
             })
+        }
+
+        function buildInputMessage(src, dest, evt, value, inputDpt) {
+            // Resolve DPT and convert value if available
+            var dpt = dptlib.resolve(inputDpt)
+            var jsValue = null
+            if (dpt && value) {
+              var jsValue = dptlib.fromBuffer(value, dpt)
+            }
+
+            // Build final input message object
+            var msg =
+            {
+                topic: dest
+                , payload: jsValue
+                , knx:
+                {
+                    event: evt
+                    , dpt: inputDpt
+                    , dptDetails: dpt
+                    , source: src
+                    , destination: dest
+                    , rawValue: value
+                }
+            }
+            return msg
         }
 
         node.on("close", function () {
