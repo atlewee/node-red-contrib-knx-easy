@@ -7,6 +7,7 @@
             topic: { value: "" },
             dpt: { value: "" },
             initialread: { value: false },
+            notifyreadrequest: { value: false },
             name: { value: "" }
         },
         inputs: 1,
@@ -226,42 +227,53 @@
         <label style="width:auto" for="node-input-initialread"> Read this value on startup </label>
         <input type="checkbox" id="node-input-initialread" style="display:inline-block; width:auto; vertical-align:top;">
     </div>
+    <div class="form-row">
+        <label style="width:auto" for="node-input-notifyreadrequest"> Notify read requests </label>
+        <input type="checkbox" id="node-input-notifyreadrequest" style="display:inline-block; width:auto; vertical-align:top;">
+    </div>
 </script>
 
 <script type="text/x-red" data-help-name="knxEasy-in">
     <p>	A notification message will be created anytime one of the following events occured for the selected group address:
         <ul>
             <li> a write request is received </li>
-            <li> a read request received </li>
             <li> a response to a read request is received </li>
         </ul>
     </p>
     <p> Creation of a manual read request is also possible by injecting messages to this node. <p>
+    <p> To handle read requests from external devices the option <strong>Notify read requests</strong> can be enabled.
+        Be aware that messages with a payload value <code>null</code> will be notified in this case.
+        A `switch` node or a custom function can be used to filter these messages if required.
+        Filter criteria: <code>msg.payload is null</code> or <code>msg.knx.event == "GroupValue_Read"</code>.
+    </p>
 
     <h3>Properties</h3>
         <dl class="message-properties">
             <dt>Gateway</dt>
             <dd> Selected KNX gateway. </dd>
-        </dl>
-        <dl class="message-properties">
+
             <dt>Group Address
                 <span class="property-type">x/y/z</span>
             </dt>
             <dd> KNX Group address to read/subscribe to. </dd>
-        </dl>
-        <dl class="message-properties">
+
             <dt>Datapoint</dt>
             <dd> KNX datapoint type (DPT). </dd>
-        </dl>
-        <dl class="message-properties">
-                <dt>Read on startup</dt>
-                <dd> When checked, a readRequest will be sent when connection is established/reestablished </dd>
+
+            <dt>Read on startup</dt>
+            <dd> When checked, a readRequest will be sent when connection is established/reestablished </dd>
+
+            <dt>Notify read requests</dt>
+            <dd>
+                When checked, received readRequests will be notified with an additional message.
+                <strong>Attention:</strong> Messages for received readRequests have a <code>msg.payload</code> and
+                <code>msg.knx.rawValue</code> with value <code>null</code>.
+            </dd>
         </dl>
 
-        <h3>Output</h3>
-        <ol class="node-ports">
+    <h3>Output</h3>
+        <ul>
             <li>Output of write requests
-                    <dl class="message-properties">
 <pre>
 msg = {
     "topic": "1/1/1",
@@ -279,30 +291,8 @@ msg = {
     "rawValue": [0]
     }
 } </pre>
-                    </dl>
-            </li>
-            <li>Output of read requests
-                    <dl class="message-properties">
-<pre> msg = {
-    "topic": "1/1/1",
-    "payload": null,
-    "knx": {
-        "event": "GroupValue_Read",
-        "dpt":"1.001",
-        "dptDetails": {
-            "name": "DPT_Switch",
-            "desc": "switch",
-            "use": "G"
-        },
-    "source": "2.2.2",
-    "destination": "1/1/1",
-    "rawValue": null
-    }
-} </pre>
-                    </dl>
             </li>
             <li>Output of responses
-                    <dl class="message-properties">
 <pre> msg = {
     "topic": "1/1/1",
     "payload": 0,
@@ -319,7 +309,24 @@ msg = {
     "rawValue": [0]
     }
 } </pre>
-                    </dl>
             </li>
-        </ol>
+            <li>Output of read requests (only available if option `Notify read requests` is enabled)
+<pre> msg = {
+    "topic": "1/1/1",
+    "payload": null,
+    "knx": {
+        "event": "GroupValue_Read",
+        "dpt":"1.001",
+        "dptDetails": {
+            "name": "DPT_Switch",
+            "desc": "switch",
+            "use": "G"
+        },
+    "source": "2.2.2",
+    "destination": "1/1/1",
+    "rawValue": null
+    }
+} </pre>
+            </li>
+        </ul>
     </script>

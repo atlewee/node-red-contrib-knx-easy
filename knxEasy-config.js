@@ -95,17 +95,23 @@ module.exports = function (RED) {
                 }
             })
             node.knxConnection.on("event", function (evt, src, dest, value) {
-                if (evt == "GroupValue_Read" || evt == "GroupValue_Write" || evt == "GroupValue_Response") {
+                if (evt == "GroupValue_Write" || evt == "GroupValue_Response" || evt == "GroupValue_Read") {
                     for (var id in node.inputUsers) {
                         if (node.inputUsers.hasOwnProperty(id)) {
                             var input = node.inputUsers[id]
                             if (input.topic == dest) {
-                                if(evt == "GroupValue_Read") {
-                                    // In case of GroupValue_Read event no payload / value is available
-                                    value = null
+                                if (evt == "GroupValue_Read") {
+                                    // Notify only in case option 'Notify read requests' is enabled
+                                    if (input.notifyreadrequest) {
+                                        // In case of GroupValue_Read event no payload / value is available
+                                        value = null
+                                        var msg = buildInputMessage(src, dest, evt, value, input.dpt)
+                                        input.send(msg)
+                                    }
+                                } else {
+                                    var msg = buildInputMessage(src, dest, evt, value, input.dpt)
+                                    input.send(msg)
                                 }
-                                var msg = buildInputMessage(src, dest, evt, value, input.dpt)
-                                input.send(msg)
                             }
                         }
                     }
