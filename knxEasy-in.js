@@ -6,6 +6,7 @@ module.exports = function (RED) {
         node.topic = config.topic
         node.dpt = config.dpt || "1.001"
         node.initialread = config.initialread || false
+        node.notifyreadrequest = config.notifyreadrequest || false
 
         if (node.server) {
             if (node.topic) {
