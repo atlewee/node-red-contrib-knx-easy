@@ -224,6 +224,38 @@
 </script>
 
 <script type="text/x-red" data-help-name="knxEasy-out">
-    <p> Set group address to write to and select the correct DPT </p>
-    <p> Values in msg.payload will be written to this group address </p>
+    <p> Node for transmission of KNX write requests to the configured group address. </p>
+
+    <h3>Properties</h3>
+        <dl class="message-properties">
+            <dt>Gateway</dt>
+            <dd> Selected KNX gateway. </dd>
+
+            <dt>Group Address
+                <span class="property-type">x/y/z</span>
+            </dt>
+            <dd> KNX group address to write. </dd>
+
+            <dt>Datapoint</dt>
+            <dd> KNX datapoint type (DPT). </dd>
+        </dl>
+
+    <h3>Inputs</h3>
+        <dl class="message-properties">
+            <dt>payload</dt>
+            <dd>Payload to transmit.
+            </dd>
+        </dl>
+
+    <h3>Details</h3>
+        <p>
+            Based on configured DPT the <code>msg.payload</code> is automatically converted into the KNX on-wire
+            representation before transmission.
+        </p>
+
+        <h4>Example for DPT 10.001 (TimeOfDay)</h4>
+        <p>
+            The <code>msg.payload</code> with a logical time value <code>"07:15:32"</code> will be transmitted as
+            KNX telegram of type <code>GroupValue_Write</code> with the 3 payload bytes <code>0x07 0x0F 0x20</code>.
+        </p>
 </script>
