@@ -130,7 +130,19 @@
             <dt>Read on startup</dt>
             <dd> When checked, a readRequest will be sent on the knx bus when connection is established/reestablished </dd>
         </dl>
-
+        <h3>Input</h3>
+        <dl class="message-properties">
+            <dt>payload</dt>
+            <dd>Any payload will trigger a read Request</dd>
+            <dt>knx</dt>
+            <dd> The following parameters can be sent to override what is configured for the node: 
+            <pre>
+{ "knx": { 
+     "destination": "1/1/1"
+    }
+}           </pre>
+            </dd>
+        </dl>
     <h3>Output</h3>
         <ul>
             <li>Output of write requests
