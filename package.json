@@ -3,8 +3,7 @@
   "version": "0.2.0",
   "description": "Use knx in node-red, just like the mqtt nodes",
   "dependencies": {
-    "knx": "2.3.2",
-    "knx-dpt": "0.0.3"
+    "knx": "2.3.3"
   },
   "node-red": {
     "nodes": {
