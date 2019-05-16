@@ -8,6 +8,8 @@
             dpt: { value: "" },
             initialread: { value: false },
             notifyreadrequest: { value: false },
+            notifyresponse: { value: false },
+            notifywrite: { value: true },
             name: { value: "" }
         },
         inputs: 1,
@@ -26,6 +28,12 @@
                 });
                 $("#node-input-dpt").val(this.dpt)
             })
+
+            // Add write as default for existing nodes
+            if (typeof this.notifywrite === 'undefined') {
+                this.notifywrite = true
+                $("#node-input-notifywrite").prop("checked", true)
+            }
         }
     })
 </script>
@@ -47,28 +55,49 @@
         <label for="node-input-name"><i class="fa fa-tag"></i> Name </label>
         <input type="text" id="node-input-name" placeholder="Name">
     </div>
-    <div class="form-row">
-        <label style="width:auto" for="node-input-initialread"> Read this value on startup </label>
-        <input type="checkbox" id="node-input-initialread" style="display:inline-block; width:auto; vertical-align:top;">
-    </div>
-    <div class="form-row">
-        <label style="width:auto" for="node-input-notifyreadrequest"> Notify read requests </label>
-        <input type="checkbox" id="node-input-notifyreadrequest" style="display:inline-block; width:auto; vertical-align:top;">
-    </div>
+    
+    <dt>Which events do you want me to output ? </dt>
+        <dd>
+            <div class="form-row">
+            <input type="checkbox" id="node-input-notifywrite" style="display:inline-block; width:auto; vertical-align:top;">
+            <label style="width:auto" for="node-input-notifywrite"> GroupValue write </label>
+            </div>
+        </dd>
+        <dd>
+            <div class="form-row">
+            <input type="checkbox" id="node-input-notifyresponse" style="display:inline-block; width:auto; vertical-align:top;">
+            <label style="width:auto" for="node-input-notifyresponse"> GroupValue response </label>
+            </div>
+        </dd>
+        <dd>
+            <div class="form-row">
+            <input type="checkbox" id="node-input-notifyreadrequest" style="display:inline-block; width:auto; vertical-align:top;">
+            <label style="width:auto" for="node-input-notifyreadrequest"> GroupValue read </label>
+            </div>
+        </dd>
+    
+        <dt> Other Options </dt>
+        <dd>
+            <div class="form-row">
+                <input type="checkbox" id="node-input-initialread" style="display:inline-block; width:auto; vertical-align:top;">
+                <label style="width:auto" for="node-input-initialread"> Read this value once on connection/reconnect </label>
+            </div>
+        </dd>
 </script>
 
 <script type="text/x-red" data-help-name="knxEasy-in">
-    <p>	A notification message will be created anytime one of the following events occured for the selected group address:
+    <p>	Depending on your settings, a notification message will be created when the following events occured for the selected group address:
         <ul>
             <li> a write request is received </li>
+            <li> a read request is received </li>
             <li> a response to a read request is received </li>
         </ul>
+        Default is to only notify write requests
     </p>
-    <p> Creation of a manual read request is also possible by injecting messages to this node. <p>
-    <p> To handle read requests from external devices the option <strong>Notify read requests</strong> can be enabled.
-        Be aware that messages with a payload value <code>null</code> will be notified in this case.
-        A `switch` node or a custom function can be used to filter these messages if required.
-        Filter criteria: <code>msg.payload is null</code> or <code>msg.knx.event == "GroupValue_Read"</code>.
+    <p> Creation of a manual read request is also possible by injecting any message to this node. <p>
+    <p> msg.payload will contain your desired value </p>
+    <p> If you have enabled notification of read requests,
+        be aware that the output msg will have a payload of <code>null</code> for these events.
     </p>
 
     <h3>Properties</h3>
@@ -84,15 +113,22 @@
             <dt>Datapoint</dt>
             <dd> KNX datapoint type (DPT). </dd>
 
-            <dt>Read on startup</dt>
-            <dd> When checked, a readRequest will be sent when connection is established/reestablished </dd>
+            <h4>What to output ? </h4>
+                <dt>GroupValue write</dt>
+                <dd>When checked, received writeRequests will be notified</dd>
 
-            <dt>Notify read requests</dt>
-            <dd>
-                When checked, received readRequests will be notified with an additional message.
-                <strong>Attention:</strong> Messages for received readRequests have a <code>msg.payload</code> and
-                <code>msg.knx.rawValue</code> with value <code>null</code>.
-            </dd>
+                <dt>GroupValue response</dt>
+                <dd>When checked, received responses will be notified</dd>
+
+                <dt>GroupValue read</dt>
+                <dd> When checked, received readRequests will be notified, this can be used to create your own response with a knxEasy-out node.
+                    <strong>Attention:</strong> Messages for received readRequests have a <code>msg.payload</code> and
+                    <code>msg.knx.rawValue</code> with value <code>null</code>.
+                </dd>
+            
+            <h4>Other options</h4>
+            <dt>Read on startup</dt>
+            <dd> When checked, a readRequest will be sent on the knx bus when connection is established/reestablished </dd>
         </dl>
 
     <h3>Output</h3>
@@ -134,7 +170,7 @@ msg = {
     }
 } </pre>
             </li>
-            <li>Output of read requests (only available if option `Notify read requests` is enabled)
+            <li>Output of read requests
 <pre> msg = {
     "topic": "1/1/1",
     "payload": null,

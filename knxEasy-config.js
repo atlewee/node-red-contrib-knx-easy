@@ -137,21 +137,35 @@ module.exports = (RED) => {
                 }
             })
             node.knxConnection.on("event", function (evt, src, dest, rawValue) {
-                if (evt == "GroupValue_Write" || evt == "GroupValue_Response" || evt == "GroupValue_Read") {
-                    node.inputUsers
-                        .filter(input => input.topic == dest)
-                        .forEach(input => {
-                            if (evt == "GroupValue_Read") {
-                                // Notify only in case option 'Notify read requests' is enabled
-                                if (input.notifyreadrequest == false) return
-                                // In case of GroupValue_Read event no payload / value is available
-                                let msg = buildInputMessage(src, dest, evt, null, input.dpt)
-                                input.send(msg)
-                            } else {
+                switch (evt) {
+                    case "GroupValue_Write": {
+                        node.inputUsers
+                            .filter(input => input.topic == dest && input.notifywrite)
+                            .forEach(input => {
                                 let msg = buildInputMessage(src, dest, evt, rawValue, input.dpt)
                                 input.send(msg)
-                            }
-                        })
+                            })
+                        break;
+                    }
+                    case "GroupValue_Response": {
+                        node.inputUsers
+                            .filter(input => input.topic == dest && input.notifyresponse)
+                            .forEach(input => {
+                                let msg = buildInputMessage(src, dest, evt, rawValue, input.dpt)
+                                input.send(msg)
+                            })
+                        break;
+                    }
+                    case "GroupValue_Read": {
+                        node.inputUsers
+                            .filter(input => input.topic == dest && input.notifyreadrequest)
+                            .forEach(input => {
+                                let msg = buildInputMessage(src, dest, evt, null, input.dpt)
+                                input.send(msg)
+                            })
+                        break;
+                    }
+                    default: return
                 }
             })
         }

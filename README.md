@@ -10,10 +10,13 @@ Set Group-address and DPT in node config to subscribe to all messages with
 that destination and  msg.payload will contain the value you want.
 
 Listen to values written to address 1/1/1:
+
 ![Input and output node](readme/input_properties.jpg)
 
+You can also suscribe to GroupValue response and GroupValue read events,
+this way you can create your own response and send it back to the bus with a knxEasy-out node.
 
-If needed, more information is available in the message outputted: 
+If you need more than the value, extended information is available in the message outputted:   
 ```
 msg = 
     { "topic": "1/1/1"
@@ -32,6 +35,7 @@ msg =
         }
     }                        
 ```
+(Read events will have payload and knx.rawValue of null)
 
 ## Output node
 Set up group address and select DPT in node configuration.
