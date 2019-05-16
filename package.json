@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-knx-easy",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Use knx in node-red, just like the mqtt nodes",
   "dependencies": {
     "knx": "2.3.3"
