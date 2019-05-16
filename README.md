@@ -1,6 +1,7 @@
 # node-red-contrib-knx-easy
 Simple Node-RED nodes for knx.
 The input and output nodes is used in a similar way as the built in mqtt nodes.
+
 ![Input and output node](readme/input_output.jpg) 
 
 
@@ -46,27 +47,29 @@ This makes it simple to connect the output node directly to a slider or a switch
 Output mode can be set to "Response" if you want to use a input-node to
 listen for readRequests and make your own responses to the knx bus.
 
-<h3>Inputs:</h3>
-    <dl class="message-properties">
-        <dt>payload</dt>
-        <dd>Value to transmit</dd>
-        <dt>knx</dt>
-        <dd> <p>The following parameters can be sent to override what is configured for the node: 
-        <pre>
+### Inputs
+    
+#### payload
+Value to transmit
+
+
+#### knx
+The following parameters can be sent to override what is configured for the node:
+```
 { "knx": { 
     "event": "GroupValue_Write",
      "dpt":"1.001",
      "destination": "1/1/1"
     }
-}                   </pre>
-                    (DPTs can be sent as 9 , "9" , "9.001" or "DPT9.001")</p>
-                    <p>Example: 
-                        If you only want to override destination you would send only that, eventType and dpt will be taken from node config:
-                    <pre>
+}
+```   
+(DPTs can be sent as 9 , "9" , "9.001" or "DPT9.001")
+
+Example: 
+    If you only want to override destination you would send only that, eventType and dpt will be taken from node config:
+```
 { "knx": { 
      "destination": "1/1/1"
     }
-}                   </pre>
-                    </p>
-            </dd>
-        </dl>
+}
+```
