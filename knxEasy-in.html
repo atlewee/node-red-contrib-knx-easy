@@ -29,10 +29,12 @@
                 $("#node-input-dpt").val(this.dpt)
             })
 
-            // Add write as default for existing nodes
+            // Add write and response as default for existing nodes like was default before
             if (typeof this.notifywrite === 'undefined') {
                 this.notifywrite = true
+                this.notifyresponse = true
                 $("#node-input-notifywrite").prop("checked", true)
+                $("#node-input-notifyresponse").prop("checked", true)
             }
         }
     })
