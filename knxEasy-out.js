@@ -1,4 +1,3 @@
-const dptlib = require('knx-dpt')
 module.exports = function (RED) {
     function knxEasyOut(config) {
         RED.nodes.createNode(this, config)
