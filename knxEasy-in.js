@@ -10,21 +10,23 @@ module.exports = function (RED) {
         node.notifywrite = config.notifywrite
         node.initialread = config.initialread || false
 
-        if (node.server) {
-            if (node.topic) {
-                node.server.register("in", node)
-            }
-        }
         node.on("input", function (msg) {
             if (node.server && node.server.knxConnection && node.topic) {
                 node.server.knxConnection.read(node.topic)
             }
         })
+
         node.on('close', function () {
             if (node.server) {
-                node.server.deregister("in", node);
+                node.server.deregister("in", node)
             }
-        });
+        })
+
+        if (node.server) {
+            if (node.topic) {
+                node.server.register("in", node)
+            }
+        }
     }
     RED.nodes.registerType("knxEasy-in", knxEasyIn)
 }
