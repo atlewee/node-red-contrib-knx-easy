@@ -11,8 +11,8 @@ module.exports = function (RED) {
         node.initialread = config.initialread || false
 
         node.on("input", function (msg) {
-            if (node.server && node.server.knxConnection && node.topic) {
-                node.server.knxConnection.read(node.topic)
+            if (node.server && node.topic) {
+                node.server.readValue(node.topic)
             }
         })
 

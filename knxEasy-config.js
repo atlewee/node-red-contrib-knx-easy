@@ -67,7 +67,7 @@ module.exports = (RED) => {
                 : node.outputUsers.push(knxNode)
 
             if (node.status === "connected" && knxNode.initialread) {
-                knxNode._events.input();
+                node.readValue(knxNode.topic);
             }
 
             if (node.inputUsers.length + node.outputUsers.length === 1) {
@@ -91,10 +91,16 @@ module.exports = (RED) => {
                 .filter(input => input.initialread)
                 .forEach(input => {
                     if (readHistory.includes(input.topic)) return
-                    setTimeout(input._events.input, delay)
+                    setTimeout(() => node.readValue(input.topic), delay)
                     delay = delay + 50
                     readHistory.push(input.topic)
                 })
+        }
+
+        node.readValue = topic => {
+            if (node.knxConnection) {
+                node.knxConnection.read(topic)
+            }
         }
 
         node.setStatusHelper = (fill, text) => {
