@@ -54,6 +54,7 @@ module.exports = (RED) => {
         var node = this
         node.host = n.host
         node.port = n.port
+        node.status = "disconnected";
         node.context().global.set("knxEasyDpts", dptlib.dpts)
 
         var knxErrorTimeout
@@ -64,6 +65,11 @@ module.exports = (RED) => {
             userType == "in"
                 ? node.inputUsers.push(knxNode)
                 : node.outputUsers.push(knxNode)
+
+            if (node.status === "connected" && knxNode.initialread) {
+                node.readValue(knxNode.topic);
+            }
+
             if (node.inputUsers.length + node.outputUsers.length === 1) {
                 node.connect();
             }
@@ -85,10 +91,16 @@ module.exports = (RED) => {
                 .filter(input => input.initialread)
                 .forEach(input => {
                     if (readHistory.includes(input.topic)) return
-                    setTimeout(input._events.input, delay)
+                    setTimeout(() => node.readValue(input.topic), delay)
                     delay = delay + 50
                     readHistory.push(input.topic)
                 })
+        }
+
+        node.readValue = topic => {
+            if (node.knxConnection) {
+                node.knxConnection.read(topic)
+            }
         }
 
         node.setStatusHelper = (fill, text) => {
@@ -100,6 +112,7 @@ module.exports = (RED) => {
         }
 
         node.setStatus = (status) => {
+            node.status = status;
             switch (status) {
                 case "connected":
                     node.setStatusHelper("green", "node-red:common.status.connected")
