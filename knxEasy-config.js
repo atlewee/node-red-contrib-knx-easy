@@ -55,7 +55,6 @@ module.exports = (RED) => {
         node.host = n.host
         node.port = n.port
         node.status = "disconnected";
-        node.context().global.set("knxEasyDpts", dptlib.dpts)
 
         var knxErrorTimeout
         node.inputUsers = []
