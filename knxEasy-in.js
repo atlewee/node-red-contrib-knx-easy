@@ -9,11 +9,22 @@ module.exports = function (RED) {
         node.notifyresponse = config.notifyresponse || false
         node.notifywrite = config.notifywrite
         node.initialread = config.initialread || false
-
+        node.listenallga = config.listenallga || false
+        
         node.on("input", function (msg) {
-            if (node.server && node.topic) {
-                node.server.readValue(node.topic)
+            if (!node.listenallga) {
+                if (node.server && node.topic) {
+                    node.server.readValue(node.topic)
+                }
+            } else {
+                if (node.server) {
+                    for (let index = 0; index < node.server.csv.length; index++) {
+                        const element = node.server.csv[index];
+                        node.server.readValue(element.ga)
+                    }
+                }
             }
+            
         })
 
         node.on('close', function () {
@@ -23,7 +34,7 @@ module.exports = function (RED) {
         })
 
         if (node.server) {
-            if (node.topic) {
+            if (node.topic || node.listenallga ) {
                 node.server.register("in", node)
             }
         }
