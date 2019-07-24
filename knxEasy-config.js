@@ -123,7 +123,7 @@ module.exports = (RED) => {
         // for (let index = 0; index < node.csv.length; index++) {
         //     RED.log.info("KnxEasy: CSV " + node.csv[index].device)
         // }
-        node.status = "disconnected"
+        node.setStatusHelper("disconnected","red","")
 
         var knxErrorTimeout
         node.inputUsers = []
@@ -183,6 +183,7 @@ module.exports = (RED) => {
         }
 
         node.setStatusHelper = (_status, _color, _text) => {
+            node.status = _status
             function nextStatus(input) {
                 input.status({ fill: _color, shape: "dot", text: "("+ input.topic +") " + _status + " " + _text  })
             }
@@ -206,7 +207,7 @@ module.exports = (RED) => {
                     error: (connstatus) => {
                         node.error(connstatus)
                         if (connstatus == "E_KNX_CONNECTION") {
-                            node.setStatusHelper("KNXError","yellow","Error KNX BUS communication")
+                            node.setStatusHelper("knxError","yellow","Error KNX BUS communication")
                         } else {
                             node.setStatusHelper("disconnected","red","")
                         }
@@ -327,7 +328,7 @@ module.exports = (RED) => {
         }
 
         node.on("close", function () {
-            node.status="disconnected"
+            node.setStatusHelper("disconnected","red","")
             node.knxConnection.Disconnect()
             node.knxConnection = null
         })
