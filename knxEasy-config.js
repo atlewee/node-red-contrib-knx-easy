@@ -36,52 +36,69 @@ toConcattedSubtypes = (acc, baseType) => {
     return acc.concat(subtypes)
 }
 
-readCSV = (_csv,RED) => {
+readCSV = (_csv, RED, _checkOnly) => {
+    var retLog = "" // if _checkOnly, returns this, otherwise, the json array of the group addresses in the csv
     if (_csv=="") {
         RED.log.info('KnxEasy: no csv ETS found')
-    }else{RED.log.info('KnxEasy: csv ETS found !')}
-    // Read and decode the CSV in an Array containing:  "group address", "DPT", "Device Name"
-    let fileGA = _csv.split("\n");
-     // Controllo se le righe dei gruppi contengono il separatore di tabulazione
-    if (fileGA[0].search("\t")==-1) {
-        RED.log.error('KnxEasy: ERROR: the csv ETS file must have the tabulation as separator')
         return null;
-    }   
-    var ajsonOutput=new Array(); // Array: qui va l'output totale con i nodi per node-red
-    for (let index = 0; index < fileGA.length; index++) {
-        const element = fileGA[index].replace(/\"/g,""); // Rimuovo le virgolette
-        
-        if (element !== "") {
-            if (element.split("\t")[1].search("-")==-1 && element.split("\t")[1].search("/")!==-1) {
-                // Ho trovato una riga contenente un GA valido, cioè con 2 "/"
-                if (element.split("\t")[5] == "") {
-                    RED.log.error("KnxEasy: ERROR: Datapoint not set in ETS CSV. Please set the datapoint with ETS and export the group addresses again. ->" + element.split("\t")[0] + " " + element.split("\t")[1])
-                    return null;
-                }
-                var DPTa = element.split("\t")[5].split("-")[1];
-                var DPTb = "";
-                try {
-                     DPTb = element.split("\t")[5].split("-")[2];
-                } catch (error) {
-                    DPTb = "001"; // default
-                }
-                if (!DPTb) {
-                    RED.log.warn("KnxEasy: WARNING: Datapoint not fully set (there is only the first part on the left of the '.'). I applied a default .001, but please set the datapoint with ETS and export the group addresses again. ->" + element.split("\t")[0] + " " + element.split("\t")[1] + " Datapoint: " + element.split("\t")[5]);
-                    DPTb = "001"; // default
-                } 
-                // Trailing zeroes
-                if (DPTb.length == 1) {
-                    DPTb = "00" + DPTb;
-                }else if (DPTb.length==2) {
-                    DPTb = "0" + DPTb;
-                }if (DPTb.length==3) {
-                    DPTb = "" + DPTb; // stupid, but for readability
-                }
-                ajsonOutput.push({ga:element.split("\t")[1],dpt:DPTa+"."+DPTb,devicename:element.split("\t")[0]});
+    } else {
+        RED.log.info('KnxEasy: csv ETS found !')
+        // Read and decode the CSV in an Array containing:  "group address", "DPT", "Device Name"
+        let fileGA = _csv.split("\n");
+        // Controllo se le righe dei gruppi contengono il separatore di tabulazione
+        if (fileGA[0].search("\t")==-1) {
+            RED.log.error('KnxEasy: ERROR: the csv ETS file must have the tabulation as separator')
+            if (_checkOnly) { 
+                return "KnxEasy: ERROR: the csv ETS file must have the tabulation as separator"
+            } else {
+                return null;
             }
+        }   
+        var ajsonOutput = new Array(); // Array: qui va l'output totale con i nodi per node-red
+        for (let index = 0; index < fileGA.length; index++) {
+            const element = fileGA[index].replace(/\"/g,""); // Rimuovo le virgolette
+            
+            if (element !== "") {
+                if (element.split("\t")[1].search("-")==-1 && element.split("\t")[1].search("/")!==-1) {
+                    // Ho trovato una riga contenente un GA valido, cioè con 2 "/"
+                    if (element.split("\t")[5] == "") {
+                        RED.log.error("KnxEasy: ERROR: Datapoint not set in ETS CSV. Please set the datapoint with ETS and export the group addresses again. ->" + element.split("\t")[0] + " " + element.split("\t")[1])
+                        if (_checkOnly) { 
+                            return "KnxEasy: ERROR: Datapoint not set in ETS CSV. Please set the datapoint with ETS and export the group addresses again. ->" + element.split("\t")[0] + " " + element.split("\t")[1]
+                        } else {
+                            return null;
+                        }
+                    }
+                    var DPTa = element.split("\t")[5].split("-")[1];
+                    var DPTb = "";
+                    try {
+                        DPTb = element.split("\t")[5].split("-")[2];
+                    } catch (error) {
+                        DPTb = "001"; // default
+                    }
+                    if (!DPTb) {
+                        RED.log.warn("KnxEasy: WARNING: Datapoint not fully set (there is only the first part on the left of the '.'). I applied a default .001, but please set the datapoint with ETS and export the group addresses again. ->" + element.split("\t")[0] + " " + element.split("\t")[1] + " Datapoint: " + element.split("\t")[5]);
+                        retLog+="KnxEasy: WARNING: Datapoint not fully set (there is only the first part on the left of the '.'). I applied a default .001, but please set the datapoint with ETS and export the group addresses again. ->" + element.split("\t")[0] + " " + element.split("\t")[1] + " Datapoint: " + element.split("\t")[5] + "<br />"
+                        DPTb = "001"; // default
+                    } 
+                    // Trailing zeroes
+                    if (DPTb.length == 1) {
+                        DPTb = "00" + DPTb;
+                    }else if (DPTb.length==2) {
+                        DPTb = "0" + DPTb;
+                    }if (DPTb.length==3) {
+                        DPTb = "" + DPTb; // stupid, but for readability
+                    }
+                    ajsonOutput.push({ga:element.split("\t")[1],dpt:DPTa+"."+DPTb,devicename:element.split("\t")[0]});
+                }
+             }
+        }
+        if (_checkOnly) { 
+            return retLog;
+        } else {
+            return ajsonOutput;
         }
     }
-    return ajsonOutput;
 }
 
 module.exports = (RED) => {
@@ -96,12 +113,13 @@ module.exports = (RED) => {
         res.json(dpts)
     });
 
+    
     function knxEasyConfigNode(n) {
         RED.nodes.createNode(this, n)
         var node = this
         node.host = n.host
         node.port = n.port
-        node.csv = readCSV(n.csv,RED,node) // Array from ETS CSV Group Addresses
+        node.csv = readCSV(n.csv,RED,false) // Array from ETS CSV Group Addresses
         // for (let index = 0; index < node.csv.length; index++) {
         //     RED.log.info("KnxEasy: CSV " + node.csv[index].device)
         // }
@@ -204,7 +222,7 @@ module.exports = (RED) => {
                             .filter(input => input.notifywrite)
                             .forEach(input => {
                                 if (input.listenallga) {
-                                    // Get the DPT
+                                    // Get the GA from CVS
                                     let oGA=node.csv.filter(sga => sga.ga == dest)[0]
                                     let msg = buildInputMessage(src, dest, evt, rawValue, oGA.dpt, oGA.devicename)
                                     input.status({ fill: "green", shape: "dot", text: "("+ msg.knx.destination +") " + msg.payload + " dpt:" + msg.knx.dpt })

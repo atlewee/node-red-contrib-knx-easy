@@ -6,10 +6,31 @@
             port: {value:3671,required:true,validate:RED.validators.number()},
             csv: {value:"",required:false},
         },
+        oneditsave: function() {
+            // Check if the csv file contains errors
+            if($("#node-config-input-csv").val() != 'undefined' && $("#node-config-input-csv").val()!=""){
+                var checkResult="Upon deploy, i'll parse the CSV. Please see the debug TAB or node-red's log for errors/warnings"
+                var myNotification= RED.notify(checkResult,
+                {
+                    modal: true,
+                    fixed: true,
+                    type: 'warning',
+                    buttons: [
+                        {
+                            text: "OK",
+                            click: function(e) {
+                                myNotification.close();
+                            }
+                        }]
+                })
+            }
+        },
         label: function() {
             return this.host+":"+this.port;
         }
     });
+
+    
 </script>
 
 <script type="text/x-red" data-template-name="knxEasy-config">

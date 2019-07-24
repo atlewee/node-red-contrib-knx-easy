@@ -39,7 +39,8 @@
             }
            
             // Hide or show the GA and DPT fields if Notify on all Group Addresses is checked
-            if (RED.nodes.node(this.server).csv!="") {
+            if(this.server){
+                if (RED.nodes.node(this.server).csv != 'undefined' && RED.nodes.node(this.server).csv!="") {
                 $("#node-input-listenallga").prop("disabled", false);
                 $("#helpallga").hide()
                 $("#node-input-listenallga").on('change',function() {
@@ -49,14 +50,18 @@
                         $("#GAandDPT").show()
                     }
                 })
+                }else{
+                    $("#node-input-listenallga").prop("disabled", true);
+                    $("#node-input-listenallga").prop("checked", false)
+                    $("#GAandDPT").show()
+                    $("#helpallga").show()
+                }
             }else{
                 $("#node-input-listenallga").prop("disabled", true);
                 $("#node-input-listenallga").prop("checked", false)
                 $("#GAandDPT").show()
                 $("#helpallga").show()
             }
-            
-            
         }
 
         

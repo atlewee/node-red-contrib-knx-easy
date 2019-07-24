@@ -11,6 +11,8 @@ module.exports = function (RED) {
         node.initialread = config.initialread || false
         node.listenallga = config.listenallga || false
         
+  
+        
         node.on("input", function (msg) {
             if (!node.listenallga) {
                 if (node.server && node.topic) {
