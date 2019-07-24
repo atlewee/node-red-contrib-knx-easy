@@ -207,7 +207,7 @@ module.exports = (RED) => {
                                     // Get the DPT
                                     let oGA=node.csv.filter(sga => sga.ga == dest)[0]
                                     let msg = buildInputMessage(src, dest, evt, rawValue, oGA.dpt, oGA.devicename)
-                                    input.status({ fill: "green", shape: "dot", text: "("+ msg.knx.destination +") " + msg.payload + " dpt: " + msg.knx.dpt })
+                                    input.status({ fill: "green", shape: "dot", text: "("+ msg.knx.destination +") " + msg.payload + " dpt:" + msg.knx.dpt })
                                     input.send(msg)                                    
                                 }else if (input.topic == dest) {
                                     let msg = buildInputMessage(src, dest, evt, rawValue, input.dpt)
