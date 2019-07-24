@@ -164,56 +164,42 @@ module.exports = (RED) => {
             }
         }
 
-        node.setStatusHelper = (fill, text) => {
+        node.setStatusHelper = (_status, _color, _text) => {
             function nextStatus(input) {
-                input.status({ fill: fill, shape: "dot", text: text })
+                input.status({ fill: _color, shape: "dot", text: "("+ input.topic +") " + _status + " " + _text  })
             }
             node.inputUsers.map(nextStatus)
             node.outputUsers.map(nextStatus)
         }
 
-        node.setStatus = (status) => {
-            node.status = status;
-            switch (status) {
-                case "connected":
-                    node.setStatusHelper("green", "node-red:common.status.connected")
-                    break
-                case "knxError":
-                    node.setStatusHelper("yellow", "connected, but error on knx-bus")
-                    break
-                case "disconnected":
-                    node.setStatusHelper("red", "node-red:common.status.disconnected")
-                    break
-                default:
-            }
-        }
-
+        
         node.connect = () => {
-            node.setStatus("disconnected")
+            node.setStatusHelper("disconnected","red","")
             node.knxConnection = new knx.Connection({
                 ipAddr: node.host,
                 ipPort: node.port,
                 handlers: {
                     connected: () => {
                         if (knxErrorTimeout == undefined) {
-                            node.setStatus("connected")
+                            node.setStatusHelper("connected","green","")
                             node.readInitialValues()
                         }
                     },
                     error: (connstatus) => {
                         node.error(connstatus)
                         if (connstatus == "E_KNX_CONNECTION") {
-                            node.setStatus("knxError")
+                            node.setStatusHelper("KNXError","yellow","Error KNX BUS communication")
                         } else {
-                            node.setStatus("disconnected")
+                            node.setStatusHelper("disconnected","red","")
                         }
                     }
                 }
             })
             node.knxConnection.on("event", function (evt, src, dest, rawValue) {
+                //RED.log.info(src + " " + dest + " " + evt)
                 switch (evt) {
                     case "GroupValue_Write": {
-                     
+                        
                         node.inputUsers
                             .filter(input => input.notifywrite)
                             .forEach(input => {
@@ -221,9 +207,11 @@ module.exports = (RED) => {
                                     // Get the DPT
                                     let oGA=node.csv.filter(sga => sga.ga == dest)[0]
                                     let msg = buildInputMessage(src, dest, evt, rawValue, oGA.dpt, oGA.devicename)
+                                    input.status({ fill: "green", shape: "dot", text: "("+ msg.knx.destination +") " + msg.payload + " dpt: " + msg.knx.dpt })
                                     input.send(msg)                                    
                                 }else if (input.topic == dest) {
                                     let msg = buildInputMessage(src, dest, evt, rawValue, input.dpt)
+                                    input.status({ fill: "green", shape: "dot", text: "("+ input.topic +") " + msg.payload})
                                     input.send(msg)
                                 }
                             })
@@ -321,7 +309,7 @@ module.exports = (RED) => {
         }
 
         node.on("close", function () {
-            node.setStatus("disconnected")
+            node.status="disconnected"
             node.knxConnection.Disconnect()
             node.knxConnection = null
         })
