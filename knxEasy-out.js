@@ -34,8 +34,11 @@ module.exports = function (RED) {
                         : node.dpt
                     if (outputtype == "response") {
                         node.server.knxConnection.respond(grpaddr, msg.payload, dpt)
+                        node.status({ fill: "green", shape: "dot", text: "Respond ("+ grpaddr +") " + msg.payload + " dpt:" + dpt })
                     } else {
                         node.server.knxConnection.write(grpaddr, msg.payload, dpt)
+                        node.status({ fill: "green", shape: "dot", text: "Write ("+ grpaddr +") " + msg.payload + " dpt:" + dpt })
+ 
                     }
                 }
             }
